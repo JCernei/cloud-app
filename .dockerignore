@@ -1,0 +1,45 @@
+# Gradle build files and directories (exclude everything except the JAR we need)
+build/*
+!build/libs/*.jar
+
+# Source code (not needed in the container)
+src/
+
+# Git repository and metadata
+.git/
+.gitignore
+
+# IDE and editor files
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+
+# Gradle wrapper and configuration
+.gradle/
+gradlew
+gradlew.bat
+gradle/
+
+# Local configuration and environment files
+*.env
+.env.*
+application*.yml
+application*.properties
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Dependency caches
+.m2/
+node_modules/
+
+# Docker-related files (optional, to avoid confusion)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Miscellaneous
+target/
+out/
