@@ -8,6 +8,6 @@ class MainController {
 
     @GetMapping("/")
     fun main(): String {
-        return "Hello World! Hello Underworld!"
+        return "Hello World! This is version 2.0 - We're testing rollback!"
     }
 }
