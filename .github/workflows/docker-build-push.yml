@@ -6,6 +6,7 @@ on:
 
 jobs:
   build-and-push:
+    # Use GitHub-hosted runner for building & pushing to Docker Hub
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -16,6 +17,14 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          
+      - name: Generate version number
+        id: version
+        run: |
+          # Create a unique version based on date, time and commit hash
+          VERSION=$(date +'%Y%m%d%H%M')-${GITHUB_SHA::7}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -31,8 +40,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/cloud-app:latest .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/cloud-app:${{ env.VERSION }} .
+          # Also tag as latest for convenience
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/cloud-app:${{ env.VERSION }} ${{ secrets.DOCKERHUB_USERNAME }}/cloud-app:latest
 
       - name: Push Docker image
         run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/cloud-app:${{ env.VERSION }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/cloud-app:latest

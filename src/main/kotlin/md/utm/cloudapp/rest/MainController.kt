@@ -8,6 +8,6 @@ class MainController {
 
     @GetMapping("/")
     fun main(): String {
-        return "Hello World test"
+        return "Hello World! This is an attempt to check the deployment pipeline."
     }
 }

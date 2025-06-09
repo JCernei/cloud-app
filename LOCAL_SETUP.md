@@ -17,10 +17,15 @@ This guide will help you set up, deploy, and verify your Spring Boot application
 1. **Add Docker Hub secrets to your GitHub repository:**
    - Go to your repo → Settings → Secrets and variables → Actions → New repository secret
    - Add `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` (Docker Hub access token)
-2. **Push or merge to `main` branch:**
-   - This triggers the workflow in `.github/workflows/docker-build-push.yml` to build and push your Docker image to Docker Hub.
-3. **Check the Actions tab:**
-   - Ensure the workflow completes successfully and the image appears in your Docker Hub repo.
+2. **Set up a self-hosted GitHub runner for deployment:**
+   - Follow instructions in `SELF_HOSTED_RUNNER.md` to set up a runner on your local machine
+   - This runner will handle the deployment to your local Kubernetes cluster
+3. **Push or merge to `main` branch:**
+   - This triggers two workflows:
+     - `docker-build-push.yml`: Builds and pushes your Docker image with a unique version tag
+     - `deploy-kubernetes.yml`: Automatically deploys the new version to your Kubernetes cluster
+4. **Check the Actions tab:**
+   - Ensure both workflows complete successfully
 
 ---
 

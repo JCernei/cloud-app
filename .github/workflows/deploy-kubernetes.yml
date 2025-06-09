@@ -1,0 +1,55 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Docker Build & Push"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  deploy:
+    # Use self-hosted runner for deployment to local Kubernetes
+    runs-on: self-hosted
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Get latest version
+        id: version
+        run: |
+          # Get the latest image tag from Docker Hub (requires jq)
+          USERNAME="${{ secrets.DOCKERHUB_USERNAME }}"
+          REPO="cloud-app"
+          
+          # Get Docker Hub token
+          TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "'${USERNAME}'", "password": "${{ secrets.DOCKERHUB_TOKEN }}"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
+          
+          # Get tags and find the latest non-"latest" tag (most recent)
+          LATEST_TAG=$(curl -s -H "Authorization: JWT ${TOKEN}" "https://hub.docker.com/v2/repositories/${USERNAME}/${REPO}/tags?page_size=100" | jq -r '.results[] | select(.name != "latest") | .name' | sort -r | head -1)
+          
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No version tags found, using 'latest'"
+            LATEST_TAG="latest"
+          fi
+          
+          echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_ENV
+          echo "latest_tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
+          
+      - name: Deploy to Kubernetes
+        run: |
+          echo "Deploying version ${LATEST_TAG} to Kubernetes..."
+          
+          # Update the deployment with the specific version
+          kubectl set image deployment/cloud-app -n cloud-app-ns cloud-app=${{ secrets.DOCKERHUB_USERNAME }}/cloud-app:${LATEST_TAG}
+          
+          # Annotate for history tracking
+          kubectl annotate deployment/cloud-app -n cloud-app-ns kubernetes.io/change-cause="Auto-deployed version ${LATEST_TAG} via GitHub Actions" --overwrite
+          
+          # Wait for rollout to complete
+          kubectl rollout status deployment/cloud-app -n cloud-app-ns
+          
+          echo "Successfully deployed version ${LATEST_TAG} to Kubernetes cluster"
