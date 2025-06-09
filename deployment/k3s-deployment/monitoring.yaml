@@ -20,8 +20,9 @@ data:
       scrape_interval: 15s
     scrape_configs:
       - job_name: 'kubernetes'
+        metrics_path: '/actuator/prometheus'
         static_configs:
-          - targets: ['cloud-app.cloud-app-ns.svc.cluster.local:8080']
+          - targets: ['cloud-app-service.cloud-app-ns.svc.cluster.local:8080']
 ---
 apiVersion: apps/v1
 kind: Deployment
