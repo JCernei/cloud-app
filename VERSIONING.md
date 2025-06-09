@@ -11,6 +11,16 @@ Using the `latest` tag in Kubernetes can lead to several issues:
 3. **Caching Issues**: Kubernetes won't pull the image again if the tag hasn't changed, even if the content has
 4. **Inconsistent Deployments**: Different nodes might have different versions of `latest`
 
+### Important Note About Rollbacks
+
+Rollbacks will not work properly if you're using the `latest` tag because Kubernetes will still use the same image even when rolling back to a previous revision. To make rollbacks work effectively, always deploy with specific version tags using:
+
+```bash
+./deployment/deploy-version.sh <dockerhub-username> <version>
+```
+
+This ensures that when you rollback, Kubernetes will use the actual previous image version rather than just the previous configuration with the same `latest` image.
+
 ## Recommended Versioning Strategy
 
 ### 1. Unique Version per Build

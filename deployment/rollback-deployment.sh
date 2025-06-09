@@ -7,6 +7,26 @@ set -e
 NAMESPACE="${1:-cloud-app-ns}"
 REVISION="$2"
 
+echo "Starting rollback process..."
+echo "Namespace: $NAMESPACE"
+echo "Target revision: $REVISION"
+
+# Check if deployment is using 'latest' tag
+CURRENT_IMAGE=$(kubectl get deployment/cloud-app -n "$NAMESPACE" -o jsonpath='{.spec.template.spec.containers[0].image}')
+if [[ "$CURRENT_IMAGE" == *":latest" ]]; then
+    echo "WARNING: Your deployment is using the 'latest' tag ($CURRENT_IMAGE)."
+    echo "Rollbacks may not work as expected because all revisions point to the same 'latest' image."
+    echo "For proper rollbacks, use versioned image tags with the deploy-version.sh script."
+    echo ""
+    echo "Example: ./deployment/deploy-version.sh <dockerhub-username> <version>"
+    echo "Continue anyway? (y/n)"
+    read -r continue_rollback
+    if [[ ! "$continue_rollback" =~ ^[Yy]$ ]]; then
+        echo "Rollback cancelled."
+        exit 0
+    fi
+fi
+
 # First check if there's any history
 if ! kubectl rollout history deployment/cloud-app -n "$NAMESPACE" | grep -q "REVISION"; then
     echo "Error: No rollout history found for deployment/cloud-app"
