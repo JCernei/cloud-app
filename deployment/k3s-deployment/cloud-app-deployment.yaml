@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: cloud-app
-        image: $DOCKERHUB_USERNAME/cloud-app:latest  # Use env var for username, tag for latest
+        image: jcernei/cloud-app:latest  # Use env var for username, tag for latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

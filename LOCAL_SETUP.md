@@ -57,7 +57,7 @@ kubectl apply -f deployment/k3s-deployment/cloud-app-hpa.yaml
   Note the `NodePort` values for Prometheus (30090), Grafana (30300), and Loki (31000).
 
 - **Access the app:**
-  - Open [http://localhost:8080](http://localhost:8080) (or the NodePort if using minikube/kind).
+  - Open [http://localhost:30000](http://localhost:30000) (as configured in cloud-app-deployment.yaml)
 
 - **Access monitoring/logging UIs:**
   - Prometheus: [http://localhost:30090](http://localhost:30090)

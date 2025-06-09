@@ -31,7 +31,7 @@ kubectl apply -f deployment/k3s-deployment/logging.yaml
 kubectl apply -f deployment/k3s-deployment/postgres-deployment.yaml
 
 # Deploy application (latest image)
-export DOCKERHUB_USERNAME
+export DOCKERHUB_USERNAME="$DOCKERHUB_USERNAME"
 ./deployment/deploy-latest.sh "$DOCKERHUB_USERNAME"
 
 # Deploy autoscaler
@@ -46,7 +46,7 @@ cat <<EOF
 ---
 All resources have been applied!
 
-- App:           http://localhost:8080 (or NodePort if using minikube/kind)
+- App:           http://localhost:30000
 - Prometheus:    http://localhost:30090
 - Grafana:       http://localhost:30300
 - Loki:          http://localhost:31000

@@ -13,7 +13,7 @@ DOCKERHUB_USERNAME="$1"
 MANIFEST="deployment/k3s-deployment/cloud-app-deployment.yaml"
 
 # Substitute Docker Hub username in manifest and apply
-export DOCKERHUB_USERNAME
+export DOCKERHUB_USERNAME="$DOCKERHUB_USERNAME"
 kubectl apply -f "$MANIFEST"
 
 echo "Deployment applied with image: $DOCKERHUB_USERNAME/cloud-app:latest"
